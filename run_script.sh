@@ -6,10 +6,10 @@ case "$1" in
         ;;
     build)
         docker build -t app .
-        docker run --rm --network host app
+        docker run -it --rm -v $(pwd):/app --network host app
         ;;
     run)
-        docker run --rm --network host app
+        docker run -it --rm -v $(pwd):/app --network host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix app
         ;;
     kill)
         docker kill trex
