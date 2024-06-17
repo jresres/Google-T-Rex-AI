@@ -22,7 +22,7 @@ def get_all_window_titles():
 def get_monitor_resolution():
     return win32api.GetSystemMetrics(0), win32api.GetSystemMetrics(1)
 
-def take_screenshot(width, height, x ,y, output_filename):
+def take_screenshot(width, height, x ,y):
     hwnd = win32gui.GetDesktopWindow()
     wDC = win32gui.GetWindowDC(hwnd)
     dcObj=win32ui.CreateDCFromHandle(wDC)
@@ -31,9 +31,8 @@ def take_screenshot(width, height, x ,y, output_filename):
     dataBitMap.CreateCompatibleBitmap(dcObj, width, height)
     cDC.SelectObject(dataBitMap)
     cDC.BitBlt((0,0),(width, height) , dcObj, (x,y), win32con.SRCCOPY)
-    dataBitMap.SaveBitmapFile(cDC, output_filename)
+    # dataBitMap.SaveBitmapFile(cDC, output_filename)
 
-    bmpinfo = dataBitMap.GetInfo()
     bmpstr = dataBitMap.GetBitmapBits(True)
 
     # Convert the raw data to an OpenCV image
@@ -55,14 +54,28 @@ def game_loop():
     x = 650
     y = 400
 
-    print("[game_loop] entering game loop")
+    # OpenCV window to display the video
+    print("[game_loop] starting game stream")
 
-    start_time = time.time()
-    take_screenshot(w,h,x,y,"out.bmp")
-    elapsed_time = time.time() - start_time
-    print(elapsed_time)
-    remaining_time = max(0, 0.1 - elapsed_time)
-    time.sleep(remaining_time)
+    try:
+        while True:
+            start_time = time.time()
+
+            img = take_screenshot(w, h, x, y)
+            cv2.imshow("Game Stream", img)
+
+            # Exit the loop if 'q' is pressed
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+            elapsed_time = time.time() - start_time
+            print(elapsed_time)
+            remaining_time = max(0, 0.1 - elapsed_time)
+            time.sleep(remaining_time)
+    except KeyboardInterrupt:
+        print("[game_loop] game streaming stopped")
+    finally:
+        cv2.destroyAllWindows()
 
 def main():
     w = 600 
