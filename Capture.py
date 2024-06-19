@@ -1,11 +1,18 @@
 import numpy as np
+import time
 import win32gui, win32ui, win32con
 
 class GameCapture:
     def __init__(self, window_name):
+        
         self.hwnd = win32gui.FindWindow(None, window_name)
         if not self.hwnd:
             raise Exception('Window not found: {}'.format(window_name))
+        
+        win32gui.SetForegroundWindow(self.hwnd)
+
+        # Let window focus
+        time.sleep(1)
 
         # get the window size
         window_rect = win32gui.GetWindowRect(self.hwnd)
