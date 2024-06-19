@@ -28,4 +28,4 @@ def detect_cactuses(image_path):
     cv2.destroyAllWindows()
 
 # Example usage
-detect_cactuses('1big.png')
+detect_cactuses('3small.png')
