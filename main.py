@@ -2,12 +2,19 @@ import cv2
 import numpy as np
 from time import time
 from Capture import GameCapture
+from Keystroke import SendKeys
 
 GAME_WINDOW = 'T-Rex Game – Google Dino Run - Google Chrome'
 
 def render_loop():
     gamecap = GameCapture(GAME_WINDOW)
     print("[render_loop] initialized capture settings")
+
+    sendkey = SendKeys(gamecap.hwnd)
+    print("[render_loop] initialized key sending")
+
+    print("[render_loop] sending start key")
+    sendkey.send_spacebar()
 
     # OpenCV window to display the video
     print("[render_loop] starting game stream")
