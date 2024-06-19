@@ -20,6 +20,7 @@ class GameCapture:
         self.screen_height = window_rect[3] - window_rect[1]
 
         # define dino game window
+        dino_pixels = 116
         self.game_width = 600
         self.game_height = 150
 
@@ -28,11 +29,12 @@ class GameCapture:
         desc_pixels = (2 * 30) + 185 # 30 pixel padding below and above description text
         button_pixels = (2 * 10) + 23 # 10 pixel padding above and below button div
         header_pixels = 125 + desc_pixels + button_pixels
-        self.screen_width = self.screen_width - (border_pixels * 2)
+        self.screen_width = self.screen_width - (border_pixels * 2) - dino_pixels
         self.screen_height = self.screen_height - header_pixels
-        self.cropped_x = border_pixels + int((self.screen_width - self.game_width) / 2)
+        self.cropped_x = border_pixels + int((self.screen_width - self.game_width) / 2) + dino_pixels
         self.cropped_y = header_pixels
-
+        self.game_width = self.game_width - 75 
+        
         # set the cropped coordinates offset so we can translate screenshot
         # images into actual screen positions
         self.offset_x = window_rect[0] + self.cropped_x
