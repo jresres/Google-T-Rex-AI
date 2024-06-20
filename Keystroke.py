@@ -9,16 +9,22 @@ class SendKeys:
         self.DOWN = win32con.VK_UP
         self.hwnd = hwnd
 
-    def send_keystroke(self, keycode):
-        win32api.SendMessage(self.hwnd, win32con.WM_KEYDOWN, keycode, 0)
-        time.sleep(0.05)
-        win32api.SendMessage(self.hwnd, win32con.WM_KEYUP, keycode, 0)
+    def send_keystroke(self, action, keycode):
+        win32api.SendMessage(self.hwnd, action, keycode, 0)
         
     def send_spacebar(self):
-        self.send_keystroke(self.SPACEBAR)
+        win32api.SendMessage(self.hwnd, win32con.WM_KEYDOWN, self.SPACEBAR, 0)
+        time.sleep(0.05)
+        win32api.SendMessage(self.hwnd, win32con.WM_KEYUP, self.SPACEBAR, 0)
 
-    def send_jump(self):
-        self.send_keystroke(self.UP)
+    def press_jump(self):
+        self.send_keystroke(win32con.WM_KEYDOWN, self.UP)
+
+    def release_jump(self):
+        self.send_keystroke(win32con.WM_KEYUP, self.UP)
     
-    def send_duck(self):
-        self.send_keystroke(self.DOWN)
+    def press_duck(self):
+        self.send_keystroke(win32con.WM_KEYDOWN, self.DOWN)
+
+    def release_duck(self):
+        self.send_keystroke(win32con.WM_KEYUP, self.DOWN)
