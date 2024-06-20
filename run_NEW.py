@@ -78,11 +78,6 @@ def game_loop():
         cv2.destroyAllWindows()
 
 def main():
-    w = 600 
-    h = 200
-    x = 650
-    y = 400
-    bmpfilenamename = "out.bmp"
 
     game_loop()
 
