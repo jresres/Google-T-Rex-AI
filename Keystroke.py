@@ -6,7 +6,7 @@ class SendKeys:
     def __init__(self, hwnd):
         self.SPACEBAR = win32con.VK_SPACE
         self.UP = win32con.VK_UP
-        self.DOWN = win32con.VK_UP
+        self.DOWN = win32con.VK_DOWN
         self.hwnd = hwnd
 
     def send_keystroke(self, action, keycode):

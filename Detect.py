@@ -29,7 +29,8 @@ class ObjectVision:
             x, y, w, h = cv2.boundingRect(contour)
 
             # Filter out smaller or irrelevant contours by size
-            if 10 < w < 100 and 10 < h < 100:
+            # Filter out dinosaur when ducking
+            if 10 < w < 100 and 10 < h < 100 and x > 5:
                 # Draw the bounding box on the original image
                 cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
@@ -45,22 +46,12 @@ class ObjectVision:
         # Return important coordinates of boundary box for nearest detected object
         return nearest_obstacle
     
-    # Return 0 if nearest obstacle is cactus or bird that can be jumped over
-    # Return 1 if nearest obstacle is bird that needs to be ducked under
-    # Return -1 if no nearest obstacle was detected 
-    def classify_nearest_obstacle(self, obstacle):
-        print(f"{obstacle[1]}")
-        # Check if cactus
-        if (obstacle[0] is not None and obstacle[2] < self.WIDTH_THRESHOLD):
-            return 0
-
+    # Return 0 is duck needed, otherwise return 1 for a jump
+    def determine_action(self, obstacle):
         # Check if bird that needs to be ducked under
-        elif (obstacle[0] is not None and obstacle[1] < self.DUCK_VERTICAL_THRESHOLD):
-            return 1
-        
-        # Check if bird that can be jumped over
-        elif (obstacle[0] is not None):
+        if (obstacle[1] < self.DUCK_VERTICAL_THRESHOLD):
             return 0
-
-        # Neither
-        return -1
+        
+        # Obstacle can be jumped over
+        else:
+            return 1
