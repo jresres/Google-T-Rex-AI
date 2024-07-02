@@ -7,6 +7,7 @@ class ObjectVision:
 
         self.DUCK_VERTICAL_THRESHOLD = 90 # Y + H for bird boundary box is ~88
         self.WIDTH_THRESHOLD = 30
+        self.CLUSTER_EDGE_THRESHOLD = 5
     
     def get_img_contours(self, img):
         # Grayscale image
@@ -20,8 +21,8 @@ class ObjectVision:
 
         return contours
     
-    def detect_obstacle(self, img, contours):
-        nearest_obstacle = [None, None, None] # X, Y + H, W
+    def detect_obstacles(self, img, contours):
+        obstacles = [] # X, Y + H, W
 
         # Filter and draw bounding boxes around the detected cactuses
         for contour in contours:
@@ -37,15 +38,38 @@ class ObjectVision:
                 # Put text above the bounding box
                 # cv2.putText(img, 'Cactus', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-                # Check for leftmost obstacle position and update if necessary
-                if nearest_obstacle[0] is None or x < nearest_obstacle[0]:
-                    nearest_obstacle[0] = x
-                    nearest_obstacle[1] = y + h
-                    nearest_obstacle[2] = w
+                obstacles.append([x, y + h, w])
         
         # Return important coordinates of boundary box for nearest detected object
-        return nearest_obstacle
+        return obstacles
     
+    # Sort obstacle coordinates in increasing x coordinate value order
+    def sort_obstacles(self, obstacles):
+        return sorted(obstacles, key=lambda x: x[0])
+
+    # returns array of boundary box coordinates of closest object [X, Y+H, W]
+    def get_nearest_obstacle(self, obstacles):
+        if obstacles:
+            return obstacles[0]
+        else:
+            return None
+
+    # Input should be sorted obstacles
+    def get_cluster_length(self, obstacles):
+        num_cactus = 1
+        for i in range(len(obstacles) - 1):
+            box_redge = obstacles[i][0] + obstacles[i][2]
+            next_box_ledge = obstacles[i + 1][0]
+            if (next_box_ledge < (box_redge + self.CLUSTER_EDGE_THRESHOLD)):
+                num_cactus = num_cactus + 1
+            else:
+                break
+                    
+        if obstacles:
+            cluster_length = (obstacles[num_cactus - 1][0] + obstacles[num_cactus - 1][2]) - obstacles[0][0]    
+
+            # print(cluster_length)
+
     # Return 0 is duck needed, otherwise return 1 for a jump
     def determine_action(self, obstacle):
         # Check if bird that needs to be ducked under

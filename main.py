@@ -4,11 +4,15 @@ from Capture import GameCapture
 from Keystroke import SendKeys
 from Detect import ObjectVision
 
-FPS = 30
+# TODO: never stops ducking after seeing bird
+# TODO: get cluster of cactus length
+
+FPS = 120
 GAME_WINDOW = 'T-Rex Game – Google Dino Run - Google Chrome'
 
 JUMP_DISTANCE_THRESHOLD = 100
-DUCK_SCALE_FACTOR = 5
+
+ACTION_DBG_MODE = False
 
 # scale jumping threshold with time
 
@@ -16,7 +20,7 @@ def render_loop():
     gamecap = GameCapture(GAME_WINDOW)
     print("[render_loop] initialized capture settings")
 
-    sendkey = SendKeys(gamecap.hwnd)
+    sendkey = SendKeys(gamecap.hwnd, ACTION_DBG_MODE)
     print("[render_loop] initialized key sending")
 
     vision = ObjectVision()
@@ -28,11 +32,11 @@ def render_loop():
     # OpenCV window to display the video
     print("[render_loop] starting game stream")
 
-    DUCK_COUNT = -1
-
     while True:
         # Capture starting time
         start_time = time()
+
+        group = []
 
         # Take screenshot
         img = gamecap.take_screenshot()
@@ -43,26 +47,26 @@ def render_loop():
         # Copy image to make writeable  
         rendered_img =  img.copy()
 
+        # Returns array of all obstacle coordinates detected sorted
+        obstacles = vision.sort_obstacles(vision.detect_obstacles(rendered_img, contours))
+
+        vision.get_cluster_length(obstacles)
+
         # Returns closest obstacle boundary box coordinates
-        nearest_obstacle = vision.detect_obstacle(rendered_img, contours)
+        nearest_obstacle = vision.get_nearest_obstacle(obstacles)
 
         # Check if object is within jumping/ducking distance
-        if (nearest_obstacle[0] is not None and nearest_obstacle[0] < JUMP_DISTANCE_THRESHOLD):
+        if (nearest_obstacle is not None and nearest_obstacle[0] < JUMP_DISTANCE_THRESHOLD):
 
             # Get what type of object is in front of dinosaur
             action = vision.determine_action(nearest_obstacle)
 
             # Set duck count to FPS
             if (action == 0):
-                DUCK_COUNT = FPS
+                sendkey.press_duck()
 
             elif (action == 1):
                 sendkey.press_jump()
-
-        # Duck and begin count
-        if DUCK_COUNT >= 0:
-            sendkey.press_duck()
-            DUCK_COUNT = DUCK_COUNT - DUCK_SCALE_FACTOR
 
         # Show rendered image
         cv2.imshow("Game Stream", rendered_img)
