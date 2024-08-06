@@ -57,8 +57,7 @@ def render_loop():
 
         # Check cluster length and decide when to cancel jump
         if (nearest_obstacle is not None and (nearest_obstacle[0] + nearest_obstacle[2]) < DUCK_DISTANCE_THRESHOLD):
-            sendkey.press_duck()
-            print("cancelling jump")
+            print(cluster_length)
 
         # Check if object is within jumping/ducking distance
         elif (nearest_obstacle is not None and nearest_obstacle[0] < JUMP_DISTANCE_THRESHOLD):
