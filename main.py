@@ -11,6 +11,7 @@ FPS = 120
 GAME_WINDOW = 'T-Rex Game – Google Dino Run - Google Chrome'
 
 JUMP_DISTANCE_THRESHOLD = 100
+DUCK_DISTANCE_THRESHOLD = 25
 
 ACTION_DBG_MODE = False
 
@@ -36,8 +37,6 @@ def render_loop():
         # Capture starting time
         start_time = time()
 
-        group = []
-
         # Take screenshot
         img = gamecap.take_screenshot()
 
@@ -50,13 +49,19 @@ def render_loop():
         # Returns array of all obstacle coordinates detected sorted
         obstacles = vision.sort_obstacles(vision.detect_obstacles(rendered_img, contours))
 
-        vision.get_cluster_length(obstacles)
+        # Get the length of the nearest cactus cluster
+        cluster_length = vision.get_cluster_length(obstacles)
 
         # Returns closest obstacle boundary box coordinates
         nearest_obstacle = vision.get_nearest_obstacle(obstacles)
 
+        # Check cluster length and decide when to cancel jump
+        if (nearest_obstacle is not None and (nearest_obstacle[0] + nearest_obstacle[2]) < DUCK_DISTANCE_THRESHOLD):
+            sendkey.press_duck()
+            print("cancelling jump")
+
         # Check if object is within jumping/ducking distance
-        if (nearest_obstacle is not None and nearest_obstacle[0] < JUMP_DISTANCE_THRESHOLD):
+        elif (nearest_obstacle is not None and nearest_obstacle[0] < JUMP_DISTANCE_THRESHOLD):
 
             # Get what type of object is in front of dinosaur
             action = vision.determine_action(nearest_obstacle)
@@ -66,7 +71,11 @@ def render_loop():
                 sendkey.press_duck()
 
             elif (action == 1):
+                sendkey.release_duck()
                 sendkey.press_jump()
+
+        else:
+            sendkey.release_duck()
 
         # Show rendered image
         cv2.imshow("Game Stream", rendered_img)

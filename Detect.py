@@ -56,6 +56,7 @@ class ObjectVision:
 
     # Input should be sorted obstacles
     def get_cluster_length(self, obstacles):
+        cluster_length = 0
         num_cactus = 1
         for i in range(len(obstacles) - 1):
             box_redge = obstacles[i][0] + obstacles[i][2]
@@ -68,7 +69,7 @@ class ObjectVision:
         if obstacles:
             cluster_length = (obstacles[num_cactus - 1][0] + obstacles[num_cactus - 1][2]) - obstacles[0][0]    
 
-            # print(cluster_length)
+        return cluster_length
 
     # Return 0 is duck needed, otherwise return 1 for a jump
     def determine_action(self, obstacle):
